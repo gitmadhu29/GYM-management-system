@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Member Home</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="logo">🏋️ GymPro</div>
+        <ul class="nav-links">
+            <li><a href="member-home.html" class="active">Home</a></li>
+            <li><a href="member.html">Dashboard</a></li>
+            <li><a href="diet.html">Diet</a></li>
+            <li><a href="supplements.html">Supplements</a></li>
+            <li><a href="#" onclick="logout()">Logout</a></li>
+        </ul>
+    </nav>
+
+    <!-- Content -->
+    <div class="container">
+        <h2>🏋️ Welcome to GymPro</h2>
+        <p>This is your personal gym space.</p>
+
+        <div class="card">
+            <h3>💪 Stay Fit</h3>
+            <p>Track your progress and stay consistent.</p>
+        </div>
+
+        <div class="card">
+            <h3>🥗 Nutrition</h3>
+            <p>Follow diet plans for best results.</p>
+        </div>
+    </div>
+    <!-- Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+    <script src="firebase-config.js"></script>
+
+    <script>
+        function logout() {
+            firebase.auth().signOut().then(() => {
+                alert("✅ Logged out successfully!");
+                window.location.href = "index.html";
+            }).catch((error) => {
+                alert("❌ Error logging out");
+                console.error(error);
+            });
+        }
+    </script>
+
+</body>
+
+</html>

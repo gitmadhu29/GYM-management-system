@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>Notifications</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="logo">🏋️ GymPro</div>
+        <ul class="nav-links">
+            <li><a href="admin.html">Main Home</a></li>
+            <li><a href="member-home.html">Home</a></li>
+            <li><a href="notifications.html" class="active">Notifications</a></li>
+            <li><a href="supplements.html">Supplements</a></li>
+            <li><a href="diet.html">Diet Plans</a></li>
+        </ul>
+    </nav>
+
+    <div class="container">
+        <h2>📢 Post a Notification</h2>
+
+        <!-- Form -->
+        <form id="noticeForm">
+            <input type="text" id="title" placeholder="Title" required />
+            <textarea id="message" placeholder="Message" rows="4" style="width: 90%; margin-top: 10px;" required></textarea>
+            <button type="submit">Post Notification</button>
+        </form>
+
+        <h2 style="margin-top: 40px;">📬 All Notifications</h2>
+        <ul id="noticeList" class="list"></ul>
+    </div>
+
+    <!-- Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+    <script src="firebase-config.js"></script>
+
+    <script>
+        const db = firebase.database();
+        const noticeForm = document.getElementById("noticeForm");
+        const noticeList = document.getElementById("noticeList");
+
+        let isAdmin = false;
+
+        // 🔐 Check login role
+        firebase.auth().onAuthStateChanged((user) => {
+            if (user && user.email === "admin@gmail.com") {
+                isAdmin = true;
+            } else {
+                isAdmin = false;
+            }
+
+            loadNotifications();
+        });
+
+        // 📬 Load notifications
+        function loadNotifications() {
+            db.ref("notifications").on("value", (snapshot) => {
+                        noticeList.innerHTML = "";
+
+                        snapshot.forEach((child) => {
+                                    const n = child.val();
+                                    const date = new Date(n.time).toLocaleString();
+
+                                    noticeList.innerHTML += `
+            <li class="card">
+              <strong>${n.title}</strong><br>
+              ${n.message}<br>
+              <small>🕒 ${date}</small><br>
+              ${isAdmin ? `<button onclick="deleteNotice('${child.key}')">❌ Delete</button>` : ""}
+            </li>`;
+        });
+      });
+    }
+
+    // ➕ Post notification
+    noticeForm.addEventListener("submit", (e) => {
+      e.preventDefault();
+
+      const title = document.getElementById("title").value;
+      const message = document.getElementById("message").value;
+
+      db.ref("notifications").push({
+        title,
+        message,
+        time: Date.now()
+      });
+
+      alert("✅ Notification posted!");
+      noticeForm.reset();
+    });
+
+    // 🗑️ Delete notification
+    function deleteNotice(id) {
+      if (!isAdmin) return;
+
+      if (confirm("Delete this notification?")) {
+        db.ref("notifications/" + id).remove();
+      }
+    }
+    </script>
+
+</body>
+
+</html>
